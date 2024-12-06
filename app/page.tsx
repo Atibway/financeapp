@@ -1,166 +1,124 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+"use client";
 
-export default function Dashboard() {
+import { useEffect, useState } from "react";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const demoIncomes = [
+  { id: "1", amount: 1500, source: "Salary", description: "Monthly salary", isRecurring: true, recurringFrequency: "monthly" },
+  { id: "2", amount: 200, source: "Freelancing", description: "Web development project", isRecurring: false },
+];
+
+const demoExpenses = [
+  { id: "1", amount: 300, category: "Rent", description: "Monthly apartment rent", isRecurring: true, recurringFrequency: "monthly" },
+  { id: "2", amount: 50, category: "Groceries", description: "Weekly groceries", isRecurring: true, recurringFrequency: "weekly" },
+];
+
+const demoBudgets = [
+  {
+    id: "1",
+    period: "monthly",
+    totalLimit: 1000,
+    startDate: "2024-01-01",
+    endDate: "2024-01-31",
+    categories: [{ category: "Rent", limit: 500 }, { category: "Groceries", limit: 200 }],
+  },
+];
+
+export default function DashboardPage() {
+  const [incomes, setIncomes] = useState(demoIncomes);
+  const [expenses, setExpenses] = useState(demoExpenses);
+  const [budgets, setBudgets] = useState(demoBudgets);
+
+  useEffect(() => {
+    // Fetch real data here if needed
+  }, []);
+
+  const incomeData = {
+    labels: incomes.map((income) => income.source),
+    datasets: [
+      {
+        label: "Income",
+        data: incomes.map((income) => income.amount),
+        backgroundColor: "rgba(75, 192, 192, 0.8)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const expenseData = {
+    labels: expenses.map((expense) => expense.category),
+    datasets: [
+      {
+        label: "Expense",
+        data: expenses.map((expense) => expense.amount),
+        backgroundColor: "rgba(255, 99, 132, 0.8)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const budgetData = {
+    labels: budgets[0].categories.map((category) => category.category),
+    datasets: [
+      {
+        label: "Budget Limit",
+        data: budgets[0].categories.map((category) => category.limit),
+        backgroundColor: "rgba(153, 102, 255, 0.8)",
+        borderColor: "rgba(153, 102, 255, 1)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Financial Dashboard</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
+    <div className="container mx-auto py-12 px-4">
+      <h1 className="text-4xl font-extrabold mb-10 text-center text-green-700">Dashboard</h1>
+
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* Income Chart */}
+        <Card className="shadow-md rounded-lg bg-white hover:shadow-lg transition-transform transform hover:scale-105">
+          <CardHeader className="p-6 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-t-lg">
+            <CardTitle className="text-xl font-semibold">Income Overview</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$1,234.56</div>
+          <CardContent className="p-6">
+            <Bar data={incomeData} />
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
+
+        {/* Expense Chart */}
+        <Card className="shadow-md rounded-lg bg-white hover:shadow-lg transition-transform transform hover:scale-105">
+          <CardHeader className="p-6 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-t-lg">
+            <CardTitle className="text-xl font-semibold">Expense Overview</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$4,567.89</div>
+          <CardContent className="p-6">
+            <Bar data={expenseData} />
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
+
+        {/* Budget Chart */}
+        <Card className="shadow-md rounded-lg bg-white hover:shadow-lg transition-transform transform hover:scale-105">
+          <CardHeader className="p-6 bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-t-lg">
+            <CardTitle className="text-xl font-semibold">Budget Overview</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$3,333.33</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Budget Remaining</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$1,234.56</div>
+          <CardContent className="p-6">
+            <Bar data={budgetData} />
           </CardContent>
         </Card>
       </div>
-      <Tabs defaultValue="expenses" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="income">Income</TabsTrigger>
-        </TabsList>
-        <TabsContent value="expenses" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Groceries</p>
-                    <p className="text-sm text-muted-foreground">
-                      June 15, 2023
-                    </p>
-                  </div>
-                  <div className="ml-auto font-medium">-$50.00</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Transportation</p>
-                    <p className="text-sm text-muted-foreground">
-                      June 14, 2023
-                    </p>
-                  </div>
-                  <div className="ml-auto font-medium">-$25.00</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Books</p>
-                    <p className="text-sm text-muted-foreground">
-                      June 13, 2023
-                    </p>
-                  </div>
-                  <div className="ml-auto font-medium">-$100.00</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="income" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Income</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Part-time Job</p>
-                    <p className="text-sm text-muted-foreground">
-                      June 15, 2023
-                    </p>
-                  </div>
-                  <div className="ml-auto font-medium">+$200.00</div>
-                </div>
-                <div className="flex items-center">
-                  <div className="ml-4 space-y-1">
-                    <p className="text-sm font-medium leading-none">Scholarship</p>
-                    <p className="text-sm text-muted-foreground">
-                      June 1, 2023
-                    </p>
-                  </div>
-                  <div className="ml-auto font-medium">+$1000.00</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
-  )
+  );
 }
-

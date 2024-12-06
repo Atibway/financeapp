@@ -1,51 +1,44 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
 import {ExpenseForm} from "./_components/ExpenseForm"
+import { useEffect, useState } from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+import Expenses from "./_components/expenses";
+ function ExpensesPage() {
+  const [isMounted, setIsMounted] = useState(false);
 
- function Expenses() {
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Expenses</h1>
-      <ExpenseForm />
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Expenses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-8">
-            <div className="flex items-center">
-              <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none">Groceries</p>
-                <p className="text-sm text-muted-foreground">
-                  June 15, 2023
-                </p>
-              </div>
-              <div className="ml-auto font-medium">-$50.00</div>
-            </div>
-            <div className="flex items-center">
-              <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none">Transportation</p>
-                <p className="text-sm text-muted-foreground">
-                  June 14, 2023
-                </p>
-              </div>
-              <div className="ml-auto font-medium">-$25.00</div>
-            </div>
-            <div className="flex items-center">
-              <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none">Books</p>
-                <p className="text-sm text-muted-foreground">
-                  June 13, 2023
-                </p>
-              </div>
-              <div className="ml-auto font-medium">-$100.00</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-4 m-5">
+      <Tabs defaultValue="expenses">
+<TabsList className="grid w-full grid-cols-2 h-12 ">
+<TabsTrigger 
+className="h-10 font-bold"
+value="expenses">Expenses</TabsTrigger>
+<TabsTrigger 
+className="h-10 font-bold"
+value="addExpense">Add Expense</TabsTrigger>
+</TabsList>
+<TabsContent value="expenses">
+<Expenses/>
+</TabsContent>
+<TabsContent value="addExpense">
+<ExpenseForm />
+</TabsContent>
+      </Tabs>
     </div>
   )
 }
 
-export default Expenses;
+export default ExpensesPage;

@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -11,135 +10,208 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addIncome } from '@/actions/inconeActions';
+import { addIncome } from '@/actions/incomeActions';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from '@/components/ui/textarea';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+
+const formSchema = z.object({
+  source: z.string().min(2, {
+    message: "Source must be at least 2 characters.",
+  }),
+  recurringFrequency: z.string().optional(),
+  description: z.string().min(5, {
+    message: "Description must be at least 5 characters.",
+  }),
+  isRecurring: z.boolean(),
+  amount: z.string().min(1, {
+    message: "Amount is required"
+  })
+});
+
+type IncomeFormValues = z.infer<typeof formSchema>;
 
 export default function IncomeForm() {
-  const [amount, setAmount] = useState('');
-  const [source, setSource] = useState('');
-  const [description, setDescription] = useState('');
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [recurringFrequency, setRecurringFrequency] = useState('');
+  const [isRecurring, setIsRecurring] = useState('no'); // Change to string
+  const [loading, setLoading] = useState(false);
+  const route = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const form = useForm<IncomeFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      source: "",
+      description: "",
+      amount: "",
+      isRecurring: false,
+      recurringFrequency: ""
+    },
+  });
 
-    // Prepare income data object
-    const incomeData = {
-      amount: parseFloat(amount),
-      source,
-      description,
-      isRecurring,
-      recurringFrequency: isRecurring ? recurringFrequency : null,
-    };
-
+  const onSubmit = async (data: IncomeFormValues) => {
+    setLoading(true);
     try {
-      const result = await addIncome(incomeData);
-
-      if (result.success) {
-        // Reset form after successful submission
-        setAmount('');
-        setSource('');
-        setDescription('');
-        setIsRecurring(false);
-        setRecurringFrequency('');
-      } else {
-        console.error(result.error);
-        alert('Failed to add income. Please try again.');
-      }
+      // Convert isRecurring string value back to boolean
+      const incomeData = {
+        ...data,
+        isRecurring: isRecurring === 'yes'
+      };
+      await addIncome(incomeData).then((res) => {
+        if (res.error) {
+          toast.error(`${res.error}`);
+          setLoading(false);
+        }
+        if (res.success) {
+          toast.success(`${res.success}`);
+          form.reset();
+          setIsRecurring('no'); // Reset isRecurring to default value
+          setLoading(false);
+          window.location.reload();
+        }
+      });
     } catch (error) {
-      console.error('Error submitting the form:', error);
+      toast.error(`Something went wrong`);
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Amount Input */}
-        <div className="space-y-2">
-          <Label htmlFor="amount">Amount</Label>
-          <Input
-            id="amount"
-            type="number"
-            placeholder="Enter amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-            spellCheck={false}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 w-full"
+      >
+        <div className="grid grid-cols-1 gap-4 md:gap-8 md:grid-cols-2 ">
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Amount</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="amount earned"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-
-        {/* Source Selector */}
-        <div className="space-y-2">
-          <Label htmlFor="source">Source</Label>
-          <Select
-            value={source || undefined}
-            onValueChange={(value) => setSource(value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select source" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="scholarship">Scholarship</SelectItem>
-              <SelectItem value="part-time job">Part-time Job</SelectItem>
-              <SelectItem value="allowance">Allowance</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Description Input */}
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Input
-            id="description"
-            placeholder="Enter description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            spellCheck={false}
-            data-ms-editor={false}
+          <FormField
+            control={form.control}
+            name="source"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Source</FormLabel>
+                <FormControl>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="scholarship">Scholarship</SelectItem>
+                      <SelectItem value="part-time job">Part-time Job</SelectItem>
+                      <SelectItem value="allowance">Allowance</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    disabled={loading}
+                    placeholder="write about your income"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="isRecurring"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Recurring Income</FormLabel>
+                <FormControl>
+                  <Select
+                    value={isRecurring} // Use string value
+                    onValueChange={setIsRecurring}
+                    disabled={loading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Is this a recurring income?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {isRecurring === 'yes' && (
+            <FormField
+              control={form.control}
+              name="recurringFrequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Recurring Frequency</FormLabel>
+                  <FormControl>
+                    <Select
+                      disabled={loading}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="yearly">Yearly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
-
-        {/* Recurring Income Selector */}
-        <div className="space-y-2">
-          <Label htmlFor="isRecurring">Recurring Income</Label>
-          <Select
-            value={isRecurring ? 'yes' : 'no'}
-            onValueChange={(value) => setIsRecurring(value === 'yes')}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Is this a recurring income?" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="yes">Yes</SelectItem>
-              <SelectItem value="no">No</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Recurring Frequency Selector */}
-        {isRecurring && (
-          <div className="space-y-2">
-            <Label htmlFor="recurringFrequency">Recurring Frequency</Label>
-            <Select
-              value={recurringFrequency || undefined}
-              onValueChange={(value) => setRecurringFrequency(value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select frequency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      </div>
-
-      {/* Submit Button */}
-      <Button type="submit">Add Income</Button>
-    </form>
+        <Button disabled={loading} className="w-full" type="submit">
+          Add Income
+        </Button>
+      </form>
+    </Form>
   );
 }

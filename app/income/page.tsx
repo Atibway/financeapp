@@ -1,40 +1,44 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+
 import IncomeForm from "./_components/IncomeForm"
 
-export default function Income() {
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+import {Incomes } from "./_components/incomes"
+import { currentUser } from "@/lib/auth"
+import { db } from "@/lib/db"
+ const Income = async()=>{
+const user = await currentUser()
+const incomes = await db.income.findMany({
+  where:{
+    userId: user?.id
+  }
+})
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Income</h1>
-      <IncomeForm />
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Income</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-8">
-            <div className="flex items-center">
-              <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none">Part-time Job</p>
-                <p className="text-sm text-muted-foreground">
-                  June 15, 2023
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$200.00</div>
-            </div>
-            <div className="flex items-center">
-              <div className="ml-4 space-y-1">
-                <p className="text-sm font-medium leading-none">Scholarship</p>
-                <p className="text-sm text-muted-foreground">
-                  June 1, 2023
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$1000.00</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-4 m-5">
+      <Tabs defaultValue="incomes">
+<TabsList className="grid w-full grid-cols-2 h-12 ">
+<TabsTrigger 
+className="h-10 font-bold"
+value="incomes">Incomes</TabsTrigger>
+<TabsTrigger 
+className="h-10 font-bold"
+value="addIncome">Add Income</TabsTrigger>
+</TabsList>
+<TabsContent value="incomes">
+<Incomes
+incomes={incomes}
+/>
+</TabsContent>
+<TabsContent value="addIncome">
+<IncomeForm />
+</TabsContent>
+      </Tabs>
     </div>
   )
 }
 
+export default Income;

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function Notifications() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 m-5">
       <h1 className="text-3xl font-bold">Notifications</h1>
       <Card>
         <CardHeader>
