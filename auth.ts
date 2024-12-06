@@ -4,6 +4,7 @@ import {PrismaAdapter} from "@auth/prisma-adapter"
 import { db } from "./lib/db"
 import { getUserById } from "./data/user"
 import { getAccountByUserId } from "./data/account"
+import Head from "next/head"
 
 export const {
   handlers, auth, signIn, signOut} = NextAuth({
