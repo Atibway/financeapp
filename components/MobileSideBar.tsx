@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { DollarSignIcon, TrendingUpIcon, PieChartIcon, GridIcon, Menu } from 'lucide-react';
+import { DollarSignIcon, TrendingUpIcon, PieChartIcon, GridIcon, Menu, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -29,6 +29,11 @@ const routes = [
     href: '/budget',
     label: 'Budget',
     icon: PieChartIcon,
+  },
+  {
+    href: '/notifications',
+    label: 'Notification',
+    icon: Bell,
   },
 ];
 

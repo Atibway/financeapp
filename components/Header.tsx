@@ -37,6 +37,10 @@ const routes = [
     href: '/budget',
     label: 'Budget',
   },
+  {
+    href: '/notifications',
+    label: 'Notifications',
+  },
 ];
 
 export const Header = () => {
