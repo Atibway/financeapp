@@ -1,5 +1,6 @@
+"use client"
 import { logout } from "@/actions/logout";
-import { redirect, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 
 
 interface LogoutButtonProps {
@@ -13,7 +14,7 @@ export const LogoutButton = ({
 const onClick = ()=> {
     logout()
     router.refresh()
-    redirect("/")
+    router.push("/auth/login")
 };
 
 return (

@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 const prisma = new PrismaClient();
 
 type ExpenseData = {
+  date:string;
   amount: string;
   category: string;
   description: string;
@@ -15,11 +16,12 @@ type ExpenseData = {
 };
 
 export async function addExpense(data: ExpenseData) {
-  const { amount, category, description, isRecurring, recurringFrequency } = data;
+  const { amount, category, description, isRecurring, recurringFrequency,date} = data;
 const user = await currentUser()
   try {
     await prisma.expense.create({
       data: {
+        date:new Date(date),
         amount: parseFloat(amount),
         category,
         description,
@@ -38,12 +40,15 @@ const user = await currentUser()
 }
 
 export async function updateExpense(id: string, data: ExpenseData) {
-  const { amount, category, description, isRecurring, recurringFrequency } = data;
+  const { amount, category, description, isRecurring, recurringFrequency 
+    , date
+  } = data;
 
   try {
     await prisma.expense.update({
       where: { id },
       data: {
+        date:new Date(date),
         amount: parseFloat(amount),
         category,
         description,

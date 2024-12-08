@@ -3,8 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
-import { NavBar } from "@/components/navBar";
+
 import { ToastProvider } from "@/providers/toast-provider";
+
+import { ClientThemeProvider } from "@/components/ClientThemeProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,13 +34,15 @@ export default async function RootLayout({
     <SessionProvider session={session}>
     <html lang="en">
       <body  className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
+    
         <ToastProvider/>
         <div className="min-h-screen">
-          <NavBar/>
+         
           <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             {children}
           </main>
         </div>
+      
       </body>
     </html>
     </SessionProvider>

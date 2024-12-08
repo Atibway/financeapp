@@ -14,7 +14,7 @@ const RegisterForm= ()=>{
   const callbackUrl = searchParams.get("callbackUrl")
     const onClick = (provider: "google" | "github")=>{
 signIn(provider, {
-    callbackUrl: callbackUrl || "/dashboard"
+    callbackUrl: "/"
 })
     }
     const router = useRouter()

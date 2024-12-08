@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,6 +31,7 @@ const formSchema = z.object({
   category: z.string().min(1,"Category is required"),
   description: z.string().min(1,"Description is required"),
   isRecurring: z.boolean(),
+  date: z.string().min(1, "date is required"),
   recurringFrequency: z.string().optional(),
 });
 
@@ -39,11 +40,12 @@ type ExpenseFormValues = z.infer<typeof formSchema>;
 export  function ExpenseForm() {
   const [loading, setLoading] = useState(false);
   const [isRecurring, setIsRecurring] = useState('no');
- const router = useRouter()
+
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: "",
+      date:"",
       category: "",
       description: "",
       isRecurring: false,
@@ -89,6 +91,22 @@ export  function ExpenseForm() {
                   <Input
                     type="number"
                     placeholder="Enter amount"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+         <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="date">Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
                     {...field}
                   />
                 </FormControl>

@@ -38,6 +38,7 @@ import { updateExpense } from '@/actions/expenseActions';
 const formSchemaUpdate = z.object({
   amount: z.string().min(1, { message: "Amount is required" }),
   category: z.string().min(1, { message: "Category is required" }),
+  date: z.string().min(1, { message: "date is required" }),
   description: z.string().min(5, { message: "Description must be at least 5 characters." }),
   isRecurring: z.string(),
   recurringFrequency: z.string().optional(),
@@ -61,6 +62,7 @@ export default function EditExpenseForm({
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(formSchemaUpdate),
     defaultValues: {
+      date:"",
       amount: "",
       category: "",
       description: "",
@@ -74,6 +76,7 @@ export default function EditExpenseForm({
       form.reset({
         amount: initialData.amount.toString(),
         category: initialData.category,
+        date: initialData.date as unknown as string,
         description: initialData.description || "",
         isRecurring: initialData.isRecurring ? "yes" : "no",
         recurringFrequency: initialData.recurringFrequency || "",
@@ -144,6 +147,22 @@ export default function EditExpenseForm({
                     </FormItem>
                   )}
                 />
+                <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="date">Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
                 <FormField
                   control={form.control}
                   name="category"
